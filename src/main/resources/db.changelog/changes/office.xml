@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="vasil" id="1">
+        <sql>
+            CREATE SEQUENCE IF NOT EXISTS office_seq START WITH 1000
+        </sql>
+    </changeSet>
+
+    <changeSet author="nikita.vasilev" id="2">
+        <sql>
+            CREATE TABLE IF NOT EXISTS office (
+                id BIGINT NOT NULL,
+                address VARCHAR(255) NOT NULL,
+                city VARCHAR(255) NOT NULL,
+                country VARCHAR(255) NOT NULL,
+                closing_time TIME NOT NULL,
+                PRIMARY KEY (id)
+                )
+        </sql>
+    </changeSet>
+
+    <changeSet author="nikita.vasilev" id="3">
+        <sql>
+            INSERT INTO office
+            VALUES
+                (1, 'Bergmannstrasse 72', 'Berlin', 'Germany', '21:00:00'),
+                (2, 'Friedrichstrasse 78', 'Berlin', 'Germany', '21:00:00'),
+                (3, 'Campus Kronberg', 'Kronberg im Taunus', 'Germany', '21:00:00'),
+                (4, 'Przyokopowa 26', 'Warszawa', 'Poland', '21:00:00')
+                ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+
+    <changeSet author="nikita.vasilev" id="4">
+        <sql>
+            CREATE TABLE IF NOT EXISTS desk (
+                id BIGINT NOT NULL,
+                desk_number VARCHAR(5) NOT NULL,
+                office_id BIGINT NOT NULL,
+                PRIMARY KEY (id),
+                FOREIGN KEY (office_id) REFERENCES office(id)
+                )
+        </sql>
+    </changeSet>
+
+    <changeSet author="nikita.vasilev" id="5">
+        <sql>
+            INSERT INTO desk
+            VALUES
+                (1, '1A', 1),
+                (2, '2A', 1),
+                (3, '3A', 1),
+                (4, '1B', 1)
+                ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+
+    <changeSet author="nikita.vasilev" id="6">
+        <sql>
+            CREATE TABLE IF NOT EXISTS reservation (
+                id BIGINT NOT NULL,
+                reservation_start_date_time timestamp NOT NULL,
+                reservation_end_date_time timestamp NOT NULL,
+                desk_id BIGINT NOT NULL,
+                PRIMARY KEY (id),
+                FOREIGN KEY (desk_id) REFERENCES desk(id)
+                )
+        </sql>
+    </changeSet>
+
+    <changeSet author="nikita.vasilev" id="7">
+        <sql>
+            INSERT INTO reservation
+            VALUES
+                (1, CURRENT_DATE + interval '8 hours', CURRENT_DATE + interval '18 hours' , 1),
+                (2, CURRENT_DATE + interval '8 hours', CURRENT_DATE + interval '18 hours' , 2),
+                (3, CURRENT_DATE + interval '8 hours', CURRENT_DATE + interval '18 hours' , 3),
+                (4, CURRENT_DATE+ interval '8 hours' , CURRENT_DATE + interval '18 hours' , 4)
+                ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
